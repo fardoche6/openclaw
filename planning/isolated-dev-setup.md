@@ -4,6 +4,26 @@
 
 You have a working OpenClaw installed globally (via `npm install -g openclaw`). You want to build and run the same repo (`~/Source/Openclaw/openclaw`) for development/testing without touching your existing `~/.openclaw` state, config, credentials, sessions, or daemon.
 
+## Command to know
+
+### 1. Restart Gateway
+
+cd ~/Source/Openclaw/openclaw
+./dev-run.sh gateway restart
+Or via systemd directly:
+systemctl --user restart openclaw-gateway-dev.service
+
+### 2. Config Openclaw
+
+./dev-run.sh gateway config
+
+### 3. Test
+
+./dev-run.sh agent --message "Hello from local model"
+http://127.0.0.1:28789
+
+systemctl --user restart openclaw-gateway-dev.service
+
 ## How OpenClaw Resolves Paths
 
 OpenClaw uses environment variables (with sane defaults) to locate everything. The key ones are:
