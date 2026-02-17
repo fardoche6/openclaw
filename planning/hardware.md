@@ -7,6 +7,11 @@
 - **GPU**: AMD Radeon RX 8060S (iGPU) — 40 CUs, up to 2.9 GHz
 - **Ollama**: Configured for Vulkan iGPU (`ollama.service` with override.conf)
 
+## Local Model Storage
+
+- GGUF models: `/home/fardoche/models/llama.cpp`
+- Ollama models: `/usr/share/ollama/.ollama/models/blobs/`
+
 ## Notes
 
 - Ollama runs on CPU only (`size_vram: 0`) despite Vulkan config — GPU offloading needs investigation
