@@ -8,13 +8,13 @@ You have a working OpenClaw installed globally (via `npm install -g openclaw`). 
 
 OpenClaw uses environment variables (with sane defaults) to locate everything. The key ones are:
 
-| Variable | Default | What It Controls |
-|---|---|---|
-| `OPENCLAW_HOME` | `~` | Base directory for deriving `~/.openclaw` |
-| `OPENCLAW_STATE_DIR` | `~/.openclaw` | Sessions, logs, caches, credentials |
-| `OPENCLAW_CONFIG_PATH` | `~/.openclaw/openclaw.json` | Main config file |
-| `OPENCLAW_GATEWAY_PORT` | `18789` | Gateway WebSocket port |
-| `OPENCLAW_PROFILE` | *(unset = default)* | Isolates daemon service names (systemd/launchd) |
+| Variable                | Default                     | What It Controls                                |
+| ----------------------- | --------------------------- | ----------------------------------------------- |
+| `OPENCLAW_HOME`         | `~`                         | Base directory for deriving `~/.openclaw`       |
+| `OPENCLAW_STATE_DIR`    | `~/.openclaw`               | Sessions, logs, caches, credentials             |
+| `OPENCLAW_CONFIG_PATH`  | `~/.openclaw/openclaw.json` | Main config file                                |
+| `OPENCLAW_GATEWAY_PORT` | `18789`                     | Gateway WebSocket port                          |
+| `OPENCLAW_PROFILE`      | _(unset = default)_         | Isolates daemon service names (systemd/launchd) |
 
 By overriding these, the dev build will be completely sandboxed from your production install.
 
@@ -116,14 +116,14 @@ If you do want a daemon, the `OPENCLAW_PROFILE=dev` variable ensures it gets a s
 
 ## Quick Reference: What Lives Where
 
-| | Production (existing) | Dev (this repo) |
-|---|---|---|
-| **Binary** | `openclaw` (global npm) | `node scripts/run-node.mjs` (local) |
-| **Config** | `~/.openclaw/openclaw.json` | `.dev-state/openclaw.json` |
-| **State** | `~/.openclaw/` | `.dev-state/` |
-| **Gateway port** | `18789` | `28789` |
-| **Profile** | *(default)* | `dev` |
-| **Daemon** | `openclaw-gateway` service | `openclaw-gateway-dev` (optional) |
+|                  | Production (existing)       | Dev (this repo)                     |
+| ---------------- | --------------------------- | ----------------------------------- |
+| **Binary**       | `openclaw` (global npm)     | `node scripts/run-node.mjs` (local) |
+| **Config**       | `~/.openclaw/openclaw.json` | `.dev-state/openclaw.json`          |
+| **State**        | `~/.openclaw/`              | `.dev-state/`                       |
+| **Gateway port** | `18789`                     | `28789`                             |
+| **Profile**      | _(default)_                 | `dev`                               |
+| **Daemon**       | `openclaw-gateway` service  | `openclaw-gateway-dev` (optional)   |
 
 ---
 
@@ -131,9 +131,9 @@ If you do want a daemon, the `OPENCLAW_PROFILE=dev` variable ensures it gets a s
 
 - [x] `pnpm install` completed successfully
 - [x] `pnpm build` completed successfully
-- [ ] `.dev-state/openclaw.json` exists with correct model + port
-- [ ] Dev gateway starts on port 28789 without errors (needs model auth keys)
-- [ ] Production gateway on port 18789 is unaffected
+- [x] `.dev-state/openclaw.json` exists with correct model + port
+- [x] Dev gateway starts on port 28789 without errors
+- [x] Production gateway is unaffected (v2026.2.15 on default port, dev is v2026.2.16 on 28789)
 
 ## Cleanup
 
