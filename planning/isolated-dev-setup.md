@@ -1,8 +1,8 @@
-# Running openclaw-1 Without Impacting Your Standard Install
+# Running the Dev Repo Without Impacting Your Standard Install
 
 ## Problem
 
-You have a working OpenClaw installed globally (via `npm install -g openclaw`). You want to build and run the `openclaw-1` repo for development/testing without touching your existing `~/.openclaw` state, config, credentials, sessions, or daemon.
+You have a working OpenClaw installed globally (via `npm install -g openclaw`). You want to build and run the same repo (`~/Source/Openclaw/openclaw`) for development/testing without touching your existing `~/.openclaw` state, config, credentials, sessions, or daemon.
 
 ## How OpenClaw Resolves Paths
 
@@ -16,7 +16,7 @@ OpenClaw uses environment variables (with sane defaults) to locate everything. T
 | `OPENCLAW_GATEWAY_PORT` | `18789` | Gateway WebSocket port |
 | `OPENCLAW_PROFILE` | *(unset = default)* | Isolates daemon service names (systemd/launchd) |
 
-By overriding these, the dev copy will be completely sandboxed from your production install.
+By overriding these, the dev build will be completely sandboxed from your production install.
 
 ---
 
@@ -25,7 +25,7 @@ By overriding these, the dev copy will be completely sandboxed from your product
 ### 1. Create an Isolated State Directory
 
 ```bash
-mkdir -p ~/Source/Openclaw/openclaw-1/openclaw-dev-state
+mkdir -p ~/Source/Openclaw/openclaw/.dev-state
 ```
 
 This will hold config, sessions, logs, and credentials for your dev version — completely separate from `~/.openclaw`.
@@ -33,7 +33,7 @@ This will hold config, sessions, logs, and credentials for your dev version — 
 ### 2. Create a Minimal Dev Config
 
 ```bash
-cat > ~/Source/Openclaw/openclaw-1/openclaw-dev-state/openclaw.json << 'EOF'
+cat > ~/Source/Openclaw/openclaw/.dev-state/openclaw.json << 'EOF'
 {
   "agents": {
     "defaults": {
@@ -56,7 +56,7 @@ EOF
 ### 3. Build the Dev Repo
 
 ```bash
-cd ~/Source/Openclaw/openclaw-1
+cd ~/Source/Openclaw/openclaw
 pnpm install
 pnpm ui:build
 pnpm build
@@ -67,30 +67,30 @@ pnpm build
 Create a script that wraps every command with the right environment:
 
 ```bash
-cat > ~/Source/Openclaw/openclaw-1/dev-run.sh << 'SCRIPT'
+cat > ~/Source/Openclaw/openclaw/dev-run.sh << 'SCRIPT'
 #!/usr/bin/env bash
-# Run openclaw-1 in isolation from the standard install.
+# Run openclaw dev build in isolation from the standard install.
 # Usage: ./dev-run.sh <any openclaw subcommand>
 # Example: ./dev-run.sh gateway --verbose
 #          ./dev-run.sh agent --message "Hello"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-export OPENCLAW_STATE_DIR="${SCRIPT_DIR}/openclaw-dev-state"
-export OPENCLAW_CONFIG_PATH="${SCRIPT_DIR}/openclaw-dev-state/openclaw.json"
+export OPENCLAW_STATE_DIR="${SCRIPT_DIR}/.dev-state"
+export OPENCLAW_CONFIG_PATH="${SCRIPT_DIR}/.dev-state/openclaw.json"
 export OPENCLAW_GATEWAY_PORT=28789
 export OPENCLAW_PROFILE=dev
 
 exec node "${SCRIPT_DIR}/scripts/run-node.mjs" "$@"
 SCRIPT
 
-chmod +x ~/Source/Openclaw/openclaw-1/dev-run.sh
+chmod +x ~/Source/Openclaw/openclaw/dev-run.sh
 ```
 
 ### 5. Run the Dev Version
 
 ```bash
-cd ~/Source/Openclaw/openclaw-1
+cd ~/Source/Openclaw/openclaw
 
 # Start the isolated gateway
 ./dev-run.sh gateway --verbose
@@ -99,8 +99,8 @@ cd ~/Source/Openclaw/openclaw-1
 ./dev-run.sh agent --message "Hello from dev"
 
 # Or use the dev loop with auto-reload
-OPENCLAW_STATE_DIR=~/Source/Openclaw/openclaw-1/openclaw-dev-state \
-OPENCLAW_CONFIG_PATH=~/Source/Openclaw/openclaw-1/openclaw-dev-state/openclaw.json \
+OPENCLAW_STATE_DIR=~/Source/Openclaw/openclaw/.dev-state \
+OPENCLAW_CONFIG_PATH=~/Source/Openclaw/openclaw/.dev-state/openclaw.json \
 OPENCLAW_GATEWAY_PORT=28789 \
 OPENCLAW_PROFILE=dev \
 pnpm gateway:watch
@@ -116,22 +116,22 @@ If you do want a daemon, the `OPENCLAW_PROFILE=dev` variable ensures it gets a s
 
 ## Quick Reference: What Lives Where
 
-| | Production (existing) | Dev (openclaw-1) |
+| | Production (existing) | Dev (this repo) |
 |---|---|---|
 | **Binary** | `openclaw` (global npm) | `node scripts/run-node.mjs` (local) |
-| **Config** | `~/.openclaw/openclaw.json` | `openclaw-1/openclaw-dev-state/openclaw.json` |
-| **State** | `~/.openclaw/` | `openclaw-1/openclaw-dev-state/` |
+| **Config** | `~/.openclaw/openclaw.json` | `.dev-state/openclaw.json` |
+| **State** | `~/.openclaw/` | `.dev-state/` |
 | **Gateway port** | `18789` | `28789` |
 | **Profile** | *(default)* | `dev` |
-| **Daemon** | `openclaw-gateway` service | `openclaw-gateway-dev` (installed ✅) |
+| **Daemon** | `openclaw-gateway` service | `openclaw-gateway-dev` (optional) |
 
 ---
 
 ## Checklist Before Testing
 
 - [x] `pnpm install` completed successfully
-- [x] `pnpm build` completed successfully  
-- [x] `openclaw-dev-state/openclaw.json` exists with correct model + port
+- [x] `pnpm build` completed successfully
+- [ ] `.dev-state/openclaw.json` exists with correct model + port
 - [ ] Dev gateway starts on port 28789 without errors (needs model auth keys)
 - [ ] Production gateway on port 18789 is unaffected
 
@@ -140,7 +140,9 @@ If you do want a daemon, the `OPENCLAW_PROFILE=dev` variable ensures it gets a s
 When done, just remove the dev state:
 
 ```bash
-rm -rf ~/Source/Openclaw/openclaw-1/openclaw-dev-state
+rm -rf ~/Source/Openclaw/openclaw/.dev-state
+rm ~/Source/Openclaw/openclaw/dev-run.sh
+# If you installed a dev daemon:
 systemctl --user disable --now openclaw-gateway-dev.service
 rm ~/.config/systemd/user/openclaw-gateway-dev.service
 ```
