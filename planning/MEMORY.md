@@ -101,7 +101,7 @@ Keep these up to date. Before any major work, verify versions match or exceed th
 | ----------------- | -------------------------------------------------------- | ---------------------------------------- | ------------------------- | ---------------------------------------------- |
 | **OS**            | Fedora 43                                                | Fedora 42+                               | `cat /etc/fedora-release` | `sudo dnf upgrade --refresh`                   |
 | **Kernel**        | 6.18.10-200.fc43                                         | 6.12+ (amdgpu gfx1151 support)           | `uname -r`                | `sudo dnf upgrade kernel`                      |
-| **Kernel params** | `iommu=pt amdgpu.gttsize=51200 ttm.pages_limit=13107200` | Must be set for iGPU memory (50 GiB GTT) | `cat /proc/cmdline`       | `sudo grubby --update-kernel=ALL --args="..."` |
+| **Kernel params** | `iommu=pt amdgpu.gttsize=54272 ttm.pages_limit=13893632` | Must be set for iGPU memory (53 GiB GTT) | `cat /proc/cmdline`       | `sudo grubby --update-kernel=ALL --args="..."` |
 | **Node.js**       | 22.22.0                                                  | 22+                                      | `node -v`                 | `sudo dnf install nodejs` or nvm               |
 | **npm**           | 10.9.4                                                   | 10+                                      | `npm -v`                  | `npm install -g npm@latest`                    |
 | **Git**           | 2.53.0                                                   | 2.30+                                    | `git --version`           | `sudo dnf install git`                         |
@@ -132,7 +132,7 @@ Keep these up to date. Before any major work, verify versions match or exceed th
 | **GPU**           | AMD Radeon RX 8060S (gfx1151, 40 CUs, 2.9 GHz) | `lspci \| grep VGA`              | Strix Halo iGPU                       |
 | **amdgpu driver** | Kernel-bundled (6.18.10)                       | `modinfo amdgpu \| grep version` | Updates with kernel                   |
 | **GPU devices**   | `/dev/dri`, `/dev/kfd`                         | `ls /dev/dri /dev/kfd`           | Must exist for ROCm                   |
-| **GPU memory**    | ~50GB GTT (of 61GB usable RAM)                 | `free -h`                        | Set via kernel params (gttsize=51200) |
+| **GPU memory**    | ~53GB GTT (of 61GB usable RAM)                 | `free -h`                        | Set via kernel params (gttsize=54272) |
 
 ### API Keys & Providers
 
@@ -158,8 +158,8 @@ Keep these up to date. Before any major work, verify versions match or exceed th
 | 2026-02-19 | Shared config at `~/.openclaw/openclaw.json` — all 3 versions (dev/test/stable) read from same file. API keys in `env` block, referenced via `${VAR}` in providers. Empty env vars with `${}` references crash the config loader — remove unused providers instead. |
 | 2026-02-19 | Telegram bot paired: @FerdinantArchambault_bot, user ID 7430205461                                                                                                                                                                                                  |
 | 2026-02-19 | Git remote switched to SSH: `git@github.com:fardoche6/openclaw.git`                                                                                                                                                                                                 |
-| 2026-02-19 | **CRITICAL**: `amdgpu.gttsize` must NOT exceed physical RAM. Old value 126976 (124G) on 64G system caused OOM crashes. Fixed to 51200 (50G). vLLM reports GTT as "total GPU memory" and allocates based on `--gpu-memory-utilization * total`.                      |
-| 2026-02-19 | vLLM safe settings for Strix Halo (50G GTT): `--gpu-memory-utilization 0.90` after GTT fix, or `0.20` with old 124G GTT. Always use `--enforce-eager` on first run to avoid graph compilation memory spikes.                                                        |
+| 2026-02-19 | **CRITICAL**: `amdgpu.gttsize` must NOT exceed physical RAM. Old value 126976 (124G) on 64G system caused OOM crashes. Fixed to 54272 (53G). vLLM reports GTT as "total GPU memory" and allocates based on `--gpu-memory-utilization * total`.                      |
+| 2026-02-19 | vLLM safe settings for Strix Halo (53G GTT): `--gpu-memory-utilization 0.95` → ~50G usable. Always use `--enforce-eager` on first run to avoid graph compilation memory spikes.                                                                                     |
 | 2026-02-19 | Local model serving: Qwen3-14B-AWQ via vLLM on port 8000, connected to OpenClaw as `local/Qwen/Qwen3-14B-AWQ` (alias: `local`). Config uses `auth: api-key` with dummy key since vLLM has no auth.                                                                  |
 | 2026-02-19 | vLLM toolbox (kyuz0/vllm-therock-gfx1151) set up for local AI via AMD Strix Halo iGPU                                                                                                                                                                               |
 | 2026-02-19 | Google Gemini API key is on free tier — quota exhausted. Needs billing enabled or new key.                                                                                                                                                                          |
