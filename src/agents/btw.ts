@@ -22,6 +22,7 @@ import { EmbeddedBlockChunker, type BlockReplyChunking } from "./pi-embedded-blo
 import { resolveModelWithRegistry } from "./pi-embedded-runner/model.js";
 import { getActiveEmbeddedRunSnapshot } from "./pi-embedded-runner/runs.js";
 import { discoverAuthStorage, discoverModels } from "./pi-model-discovery.js";
+import { registerProviderStreamForModel } from "./provider-stream.js";
 import { stripToolResultDetails } from "./session-transcript-repair.js";
 
 type SessionManagerLike = {
@@ -282,6 +283,8 @@ export async function runBtwSideQuestion(
     });
     await blockEmitChain;
   };
+
+  registerProviderStreamForModel({ model, cfg: params.cfg });
 
   const stream = streamSimple(
     model,

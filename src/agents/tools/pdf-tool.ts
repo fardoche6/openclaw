@@ -4,6 +4,7 @@ import type { OpenClawConfig } from "../../config/config.js";
 import { extractPdfContent, type PdfExtractedContent } from "../../media/pdf-extract.js";
 import { loadWebMediaRaw } from "../../media/web-media.js";
 import { resolveUserPath } from "../../utils.js";
+import { registerProviderStreamForModel } from "../provider-stream.js";
 import {
   coerceImageModelConfig,
   type ImageModelConfig,
@@ -200,6 +201,7 @@ async function runPdfPrompt(params: {
     modelOverride: params.modelOverride,
     run: async (provider, modelId) => {
       const model = resolveModelFromRegistry({ modelRegistry, provider, modelId });
+      registerProviderStreamForModel({ model, cfg: effectiveCfg });
       const apiKey = await resolveModelRuntimeApiKey({
         model,
         cfg: effectiveCfg,
